@@ -232,9 +232,8 @@ public class EventListener implements Listener {
 				} else {
 					//destroy items
 					p.setItemInHand(new ItemStack(Material.AIR));
+					p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 3));
 				}
-				
-				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 3));
 				
 				//restart cool-down timer
 				playerWaitHash.put(p.getName(), System.currentTimeMillis());
