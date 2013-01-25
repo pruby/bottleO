@@ -191,7 +191,7 @@ public class EventListener implements Listener {
 						}
 					}
 				}
-			} else if (e.getMaterial() == Material.EMERALD || e.getMaterial() == Material.EMERALD_BLOCK) {
+			} else if (e.getMaterial() == Material.EMERALD || e.getMaterial() == Material.EMERALD_BLOCK || e.getMaterial() == Material.EXP_BOTTLE) {
 				Player p = e.getPlayer();
 				//check player has waited for the required amount of time
 				if (!playerWaitHash.containsKey(p.getName())) {
@@ -211,15 +211,28 @@ public class EventListener implements Listener {
 				ItemStack i = p.getItemInHand();
 				Material m = e.getMaterial();
 				int amount = i.getAmount();
-				int xp = amount*BOTTLES_PER_EMERALD*XP_PER_BOTTLE;
-				if (m == Material.EMERALD_BLOCK) {
-					xp *= EMERALDS_PER_BLOCK;
+				int xp = 0;
+				switch (m) {
+					case EMERALD_BLOCK:
+						xp = amount * EMERALDS_PER_BLOCK * BOTTLES_PER_EMERALD * XP_PER_BOTTLE;
+						break;
+					case EMERALD:
+						xp = amount * BOTTLES_PER_EMERALD * XP_PER_BOTTLE;
+						break;
+					case EXP_BOTTLE:
+						xp = amount * XP_PER_BOTTLE;
+						break;
 				}
 				PlayerExpChangeEvent event = new PlayerExpChangeEvent(p, xp);
 				Bukkit.getPluginManager().callEvent(event);
 				
-				//destroy items
-				p.setItemInHand(new ItemStack(Material.AIR));
+				if (m == Material.EXP_BOTTLE) {
+					//return empty bottles
+					p.setItemInHand(new ItemStack(Material.GLASS_BOTTLE, amount));
+				} else {
+					//destroy items
+					p.setItemInHand(new ItemStack(Material.AIR));
+				}
 				
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 3));
 				
